@@ -1,58 +1,118 @@
-﻿# pycaruna
 
-Basic Python implementation for interfacing with Caruna's API. It supports only basic methods, 
-but enough to extract electricity usage data for further processing.
+# Caruna Integration
 
-Supported features:
+  
 
-* Get user profile information
-* Get metering points
-* Get consumption data (daily/hourly, optioanlly divided by tariffs)
+This project implement integration to Caruna+ service, which offers information about the energy consumption of a metering point in Caruna network. Caruna+ service is available for Caruna's end customers for which Caruna is the electric network provider.
 
-## Usage
+This implementation is based on Kimmo Linna's pycaruna, which is used unmodified here. I've moved the licence and readme-files from the root to pycaruna-folder
 
-> TODO: Publish to PyPi
+  
 
-You can use this package by adding the following to your `requirements.txt`:
+# Configuration
 
-```
-git+https://github.com/Jalle19/pycaruna.git@7289352ee5f0a829c21a71f131ad34df9f3c3c24#egg=pycaruna==0.0.2
-```
+All configuration is done on the /[caruna_integration/config.ini](/caruna_integration/config.ini). Be default most of the values are taken from environment variables, for that reason settings can be changed, either by provided a /.env -file or by directly changing the configuration on the [config.ini](/caruna_integration/config.ini)-file.
 
-The library can then be used like this:
+  
 
-```python
-import json
-from datetime import date, datetime
-from pycaruna import Caruna, Resolution
+# Running modes
 
-if __name__ == '__main__':
-    caruna = Caruna('you@example.com', 'password')
-    caruna.login()
+This integration can be run as python script or as dockerized container.
 
-    customer = caruna.get_user_profile()
-    metering_points = caruna.get_metering_points(customer['username'])
+  
 
-    end_time = datetime.combine(date.today(), datetime.min.time()).astimezone().isoformat()
-    start_time = datetime.combine(date.today().replace(day=1), datetime.min.time()).astimezone().isoformat()
-    metering_point = metering_points[0]['meteringPoint']['meteringPointNumber']
+## Python script-mode
 
-    consumption = caruna.get_consumption(customer['username'],
-                                         metering_points[0]['meteringPoint']['meteringPointNumber'],
-                                         Resolution.DAYS, True,
-                                         start_time, end_time)
-    print(json.dumps(consumption))
-```
+In this mode the script runs in endless single threaded loop until a key is pressed.
 
-The resources directory has examples of API response structures.
+  
 
-Please note that the authentication procedure requires a lot of HTTP requests to be sent back and forth, so the 
-script is relatively slow.
+### Pre-requisites
 
-## Credits
+1. Valid Caruna+ user account
 
-https://github.com/kimmolinna/pycaruna
+2. postgresql database with table energy_hourly (see [Database](#Database))
 
-## License
+3. python version 3 or above
 
-MIT
+4. Configuration done in the config.ini or as .env-file
+
+  
+
+### Installing requirements
+
+In order to run the script the requirements needs to be installed. This can be done with command `pip install -r requirements.txt`.
+
+  
+
+### Starting the script
+
+The script can be started with command `python main.py`. Script runs with timeloop and fetches the data on the interval of seconds set in [config.ini](/caruna_integration/config.ini)->`job_interval`.
+
+  
+
+## Docker-mode
+
+In this mode the script runs in an docker container.
+
+  
+
+### Pre-requisites
+
+1. Valid Caruna+ user account
+
+2. postgresql database with table energy_hourly (see [Database](#Database))
+
+3. Docker
+
+4. Configuration done in the config.ini or as .env-file
+
+  
+
+### Creating the docker image
+
+Before the appliction is run as container, it needs the image to be created. This can be created with command `docker build -t jsdesign/caruna-integration:latest .`
+
+  
+
+### Running the docker image
+
+The docker container can be run with command `docker run jsdesign/caruna-integration:latest`
+
+  
+
+# Database
+
+  
+
+This integration relies on postgresql database and it pushes the data in to the table `energy_hourly`.
+
+  
+
+## Create statement for energy_hourly
+
+  
+
+```CREATE TABLE IF NOT EXISTS public.energy_hourly
+
+(
+
+id bigint NOT NULL DEFAULT nextval('energy_hourly_id_seq'::regclass),
+
+datetime timestamp with time zone,
+
+kwh_total double precision,
+
+kwh_night double precision,
+
+kwh_day double precision,
+
+kwh_night_winter double precision,
+
+tariff character varying COLLATE pg_catalog."default",
+
+CONSTRAINT energy_hourly_pkey PRIMARY KEY (id),
+
+CONSTRAINT datetime UNIQUE (datetime)
+
+)```
