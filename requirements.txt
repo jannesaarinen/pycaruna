@@ -1,10 +1,10 @@
-beautifulsoup4==4.11.1
+beautifulsoup4>=4.11.1
 # paho_mqtt==1.6.1
 # psycopg2==2.9.3
-psycopg2_binary==2.9.3
-requests==2.27.1
-setuptools==57.4.0
-timeloop-ng==1.0.0
+psycopg2_binary>=2.9.3
+requests>=2.27.1
+setuptools>=57.4.0
+timeloop-ng>=1.0.0
 lxml>=4.6
-python_dotenv==0.21.0
+python_dotenv>=0.21.0
 # compiler==0.2.0
