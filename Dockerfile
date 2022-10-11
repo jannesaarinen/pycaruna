@@ -10,10 +10,10 @@ RUN apt-get -y install libz-dev
 ADD requirements.txt /
 RUN pip install lxml
 RUN pip install -r requirements.txt
-ADD caruna_integration/config.ini /caruna_integration/
 ADD caruna_integration/*.py /caruna_integration/
 ADD pycaruna/*.py /pycaruna/
 ADD main.py /
+ADD caruna_integration/config.ini /caruna_integration/
 ADD .env /
 ADD start.sh /
 # CMD [ "python", "./main.py" ]
