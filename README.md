@@ -1,9 +1,13 @@
+# pycaruna
 
-# Caruna Integration
+Basic Python implementation for interfacing with Caruna Plus (sometimes called _Caruna+_). It supports only basic 
+methods, but enough to extract electricity usage data for further processing.
 
-  
+Supported features:
 
-This project implement integration to Caruna+ service, which offers information about the energy consumption of a metering point in Caruna network. Caruna+ service is available for Caruna's end customers for which Caruna is the electric network provider.
+* Get user profile information
+* Get metering points ("assets")
+* Get consumption data (daily/hourly)
 
 This implementation is based on Kimmo Linna's pycaruna, which is used unmodified here. I've moved the licence and readme-files from the root to pycaruna-folder
 
@@ -28,6 +32,13 @@ In this mode the script runs in endless single threaded loop until a key is pres
   
 
 ### Pre-requisites
+The `assets/` directory has example Python programs illustrrating how to use the library.
+
+The `resources/` directory has examples of API response structures.
+
+Please note that the authentication procedure requires a lot of HTTP requests to be sent back and forth, so the 
+script is relatively slow. It's best to store the token produced by it and reusing that instead of doing the 
+authentication process all over again.
 
 1. Valid Caruna+ user account
 
