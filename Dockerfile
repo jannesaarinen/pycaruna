@@ -11,10 +11,11 @@ ADD requirements.txt /
 RUN pip install lxml
 RUN pip install -r requirements.txt
 ADD caruna_integration/*.py /caruna_integration/
+ADD caruna_integration/*.ini /caruna_integration/
 ADD pycaruna/*.py /pycaruna/
 ADD main.py /
 ADD caruna_integration/config.ini /caruna_integration/
 ADD .env /
 ADD start.sh /
+ENTRYPOINT [ "/bin/sh", "/start.sh" ]
 # CMD [ "python", "./main.py" ]
-ENTRYPOINT [ "/start.sh" ]
